@@ -1,0 +1,98 @@
+import sys
+import os
+import todolist
+from datetime import date
+import json
+import prettytable # Requires prettytable; installed with: pip install prettytable
+from prettytable import PrettyTable
+
+def display_tasks_with_table(tasks):
+    """
+    Displays a list of tasksformatted cleanly as a table.
+    Expects 'tasks' to be a list of dictionaries.
+    """
+
+    # Create the table instance and define column headers
+    table = PrettyTable()
+    table.field_names = ["ID", "Task Title", "Status", "Due Date"]
+
+    # Align text columns to the left for better readability
+    table.align["Task Title"] = "l"
+
+    # Populate rows dynamically from my tasks data
+    for index, task in enumerate(tasks, start=1):
+        table.add_row([
+            index,
+            task.get("title", "N/A"),
+            "Completed" if task.get("completed") else ("Pending"),
+            task.get("due_date", "N/A")
+        ])
+
+    # Print the final formatted grid to the console
+    print(table)
+
+if os.path.exists("tasks.json"):
+    try:
+       with open("tasks.json", "r") as file:
+             task_list = json.load(file) 
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error loading tasks.json: {e}")
+        task_list = [] # Fallback to empty if corrupted
+else: 
+    # Fallback default list (using safe string dates)
+
+    task_list = [
+        {"title": "Wedding invitation", "completed": False, "due_date": None},
+        {"title":"Friday mass every week", "completed": False, "due_date": None}, 
+        {"title":"Counseling sessions, last Thursday, every month", "completed": False, "due_date": date(2026, 7, 29)}          
+        ]
+
+
+def display_menu():
+    print("\n--- To-Do List Menu ---")
+    print("(A) Add a new task.")
+    print("(C) Mark a task as completed.")
+    print("(D) Delete a task.")
+    print("(L) List all tasks.")
+    print("(Q) Quit.")
+
+def main():
+      task_list = [
+          {"title": "Wedding invitation", "completed": False, "due_date": None},
+          {"title":"Friday mass every week", "completed": False, "due_date": None}, 
+          {"title":"Counseling sessions, last Thursday, every month", "completed": False, "due_date": date(2026, 7, 29)}
+
+      ]
+      while True:
+        display_menu()
+      
+        choice = input("\nChoose an option: ").strip().upper()
+        
+        if choice == "A":
+            # Assuming add_task handles its own input prompts inside todolist.py
+            # Or you can pass input like: todolist.add_task(input("Enter task description: "))
+            task_title = input("Enter task description/title: ")
+            todolist.add_task(task_list, task_title)
+        elif choice == "C":
+            task_num = int(input("Enter the task number to complete: "))
+            todolist.complete_task(task_list, task_num)
+        elif choice == "D":
+            del_num = int(input("Enter the task number to delete: "))
+            todolist.delete_task(task_list, del_num)
+        elif choice == "L":
+            todolist.list_tasks(task_list)
+            #display_tasks_with_table(task_list)
+        elif choice == "Q":
+            # Prompt user to save task before quitting
+            save_choice = input("Would you like to save the current task list to a file? (Y/N): ").strip().upper()
+            if save_choice == 'Y':
+                todolist.save_tasks(task_list)
+                print("Task list saved successfully.")
+
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid option. Please choose A, C, D, L, or Q.")
+
+if __name__ == "__main__":
+    main()
