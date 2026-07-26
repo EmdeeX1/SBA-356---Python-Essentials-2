@@ -1,0 +1,33 @@
+from datetime import date
+
+class Task:
+    """
+    A class to represent a single task in a To-Do list.
+    """
+
+    def __init__(self, title, due_date=None, completed=False):
+        """
+        Initializer to set up the task attributes.
+        """
+        self.title = title
+        self.due_date = due_date
+        self.completed = completed
+
+        def __str__(self):
+            """ Returns  a well-formatted string representation of the task. 
+            """
+
+            # Determine the completion status marker
+            status = "[X]" if self.completed else "[-]"
+
+            # Determine the due date string  format
+            if self.due_date:
+                # If due_date is a datetime.date object, format it as YYYY-MM-DD
+                if isinstance(self.due_date, date):
+                    due_str = f" (due {self.due_date.strftime('%Y-%m-%d')})"
+                else:
+                    due_str = f" (due {self.due_date})"
+            else:
+                due_str = ""
+                return f"{status} {self.title}{due_str}"
+        
